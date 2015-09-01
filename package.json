@@ -1,0 +1,19 @@
+{
+  "name": "raspbus-monitor",
+  "version": "1.0.0",
+  "description": "A Raspberry Pi environmental monitor, attached to a bus",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/werdnanoslen/raspbus-monitor.git"
+  },
+  "author": "Andrew Nelson <andy@andyhub.com>",
+  "license": "GPLv2",
+  "bugs": {
+    "url": "https://github.com/werdnanoslen/raspbus-monitor/issues"
+  },
+  "homepage": "https://github.com/werdnanoslen/raspbus-monitor"
+}
