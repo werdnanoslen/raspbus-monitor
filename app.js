@@ -1,25 +1,7 @@
 var app = require('http').createServer(handler)
+  , io = require('socket.io').listen(app)
   , url= require('url')
-  , fs = require('fs');
-
-io = require('socket.io').listen(app);
-// Web Socket Connection
-io.sockets.on('connection', function (socket) {
-
-  // If we recieved a command from a client to start watering lets do so
-  socket.on('ping', function(data) {
-      console.log("ping");
-
-      delay = data["duration"];
-
-      // Set a timer for when we should stop watering
-      setTimeout(function(){
-          socket.emit("pong");
-      }, delay*1000);
-
-  });
-
-});
+  , fs = require('fs')
 
 app.listen(5000);
 
@@ -28,7 +10,6 @@ function handler (req, res) {
 
     // Using URL to parse the requested URL
     var path = url.parse(req.url).pathname;
-    console.log(path);
 
     // Managing the root route
     if (path == '/') {
@@ -62,3 +43,21 @@ function handler (req, res) {
     }
 
 }
+
+// Web Socket Connection
+io.sockets.on('connection', function (socket) {
+
+  // If we recieved a command from a client to start watering lets do so
+  socket.on('ping', function(data) {
+      console.log("ping");
+
+      delay = data["duration"];
+
+      // Set a timer for when we should stop watering
+      setTimeout(function(){
+          socket.emit("pong");
+      }, delay*1000);
+
+  });
+
+});

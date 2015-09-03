@@ -7,5 +7,5 @@ socket.on('pong', function (data) {
 $(document).ready(function() {
     $("#hello").click(function(){
         socket.emit('ping', { duration: 2 });
-    });
+    }); 
 });
