@@ -18,6 +18,7 @@
   "homepage": "https://github.com/werdnanoslen/raspbus-monitor",
   "dependencies": {
     "jquery": "^2.1.4",
+    "onoff": "^1.0.2",
     "requirejs": "^2.1.20",
     "socket.io": "^1.3.6"
   }
