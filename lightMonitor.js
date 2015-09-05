@@ -1,4 +1,4 @@
-var GPIO = require('onoff').Gpio;
+var gpio = require("pi-gpio");
 
 // To read pin 16
 gpio.read(25, function(err, value) {
