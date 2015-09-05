@@ -6,4 +6,4 @@ gpio.setDirection(16,input, function() {
         if(err) throw err;
         console.log(value); // The current state of the pin
     });
-}
+});
