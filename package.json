@@ -1,25 +1,16 @@
 {
-  "name": "raspbus-monitor",
+  "name": "test",
   "version": "1.0.0",
-  "description": "A Raspberry Pi environmental monitor, attached to a bus",
-  "main": "index.js",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/werdnanoslen/raspbus-monitor.git"
-  },
-  "author": "Andrew Nelson <andy@andyhub.com>",
-  "license": "GPLv2",
-  "bugs": {
-    "url": "https://github.com/werdnanoslen/raspbus-monitor/issues"
-  },
-  "homepage": "https://github.com/werdnanoslen/raspbus-monitor",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "jquery": "^2.1.4",
-    "onoff": "^1.0.2",
-    "requirejs": "^2.1.20",
+    "express": "^4.13.3",
     "socket.io": "^1.3.6"
   }
 }
