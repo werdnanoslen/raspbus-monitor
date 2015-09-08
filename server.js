@@ -4,6 +4,8 @@ var io = require('socket.io')(server);
 var Engine = require('tingodb')();
 var database = new Engine.Db(__dirname + '/db', {});
 var sampleCollection = database.collection('somestuff');
+var GPIO = require('onoff').Gpio;
+var led = new GPIO(18, 'out');
 
 server.listen(8080);
 console.log('Server listening on port :8080');
@@ -15,7 +17,9 @@ app.get('/', function(req, res) {
 
 io.on('connection', function(socket) {
     setInterval(function() {
-        var data = getRandomInt(0, 100);
+        var state = led.readSync();
+        led.writeSync(Number(!state));
+        var data = Number(state);
         sampleCollection.insert({
             "sensorvalue": data,
             "datetime": new Date()
