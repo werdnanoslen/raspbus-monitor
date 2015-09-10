@@ -12,7 +12,7 @@ console.log('Server listening on port :8080');
 
 
 app.get('/', function(req, res) {
-    res.sendfile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 io.on('connection', function(socket) {
