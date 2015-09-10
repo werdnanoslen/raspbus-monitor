@@ -1,3 +1,5 @@
+'use strict';
+
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
@@ -17,9 +19,10 @@ app.get('/', function(req, res) {
 
 io.on('connection', function(socket) {
     setInterval(function() {
-        var state = led.readSync();
-        led.writeSync(Number(!state));
-        var data = Number(state);
+        // var state = led.readSync();
+        // led.writeSync(Number(!state));
+        // var data = Number(state);
+        var data = getRandomInt(0, 100);
         sampleCollection.insert({
             "sensorvalue": data,
             "datetime": new Date()
