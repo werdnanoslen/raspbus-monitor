@@ -1,66 +1,65 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="author" content="lnmunhoz">
 
-  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/2.1.0/knockout-min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.3/socket.io.min.js"></script>
-  <title>Chart.js with Socket.io</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="lnmunhoz">
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/2.1.0/knockout-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.3/socket.io.min.js"></script>
+    <title>Chart.js with Socket.io</title>
 </head>
+
 <body>
 
-  <div>
-    <canvas id="canvas" height="450" width="600"></canvas>
-  </div>
+    <div>
+        <canvas id="canvas" height="450" width="600"></canvas>
+    </div>
 
-  <script type="text/javascript">
+    <script type="text/javascript">
+        function MainViewModel(data) {
+            var self = this;
+            var socket = io.connect('http://143.215.108.108:8080');
 
-  function MainViewModel(data) {
-    var self = this;
-    var socket = io.connect('localhost:8080');
+            self.lineChartData = ko.observable({
+                labels: ["t-4", "t-3", "t-2", "t-1", "t-0"],
+                datasets: [{
+                    fillColor: "rgba(151,187,205,0.5)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    data: [0, 0, 0, 0, 0]
+                }]
+            });
 
-    self.lineChartData = ko.observable({
-      labels : ["10S","20S","30S","40S","50S","60S","70S"],
-      datasets : [
-        {
-          fillColor : "rgba(151,187,205,0.5)",
-          strokeColor : "rgba(151,187,205,1)",
-          pointColor : "rgba(151,187,205,1)",
-          pointStrokeColor : "#fff",
-          data : [65,59,90,81,56,55,40]
+            socket.on('pushdata', function(data) {
+                self.lineChartData().datasets[0].data.shift();
+                self.lineChartData().datasets[0].data.push(data);
+                self.initLine();
+            });
+
+            self.initLine = function() {
+                var options = {
+                    animation: false,
+                    scaleOverride: true,
+                    scaleSteps: 1, // The number of steps in a hard coded scale
+                    scaleStepWidth: 1, // The value jump in the hard coded scale
+                    scaleStartValue: 0 // The scale starting value
+                };
+
+                var ctx = $("#canvas").get(0).getContext("2d");
+                var myLine = new Chart(ctx).Line(vm.lineChartData(), options);
+            }
+
         }
-      ]
-    });
 
-    socket.on('pushdata', function (data) {
-      self.lineChartData().datasets[0].data.shift();
-      self.lineChartData().datasets[0].data.push(data);
-      self.initLine();
-    });
-
-    self.initLine = function() {
-      var options = {
-        animation : false,
-        scaleOverride : true,
-        scaleSteps : 10, // The number of steps in a hard coded scale
-        scaleStepWidth : 10, // The value jump in the hard coded scale
-        scaleStartValue : 10 // The scale starting value
-      };
-
-      var ctx = $("#canvas").get(0).getContext("2d");
-      var myLine = new Chart(ctx).Line( vm.lineChartData(), options );
-    }
-
-  }
-
-  var vm = new MainViewModel();
-  ko.applyBindings(vm);
-  vm.initLine();
-
-  </script>
+        var vm = new MainViewModel();
+        ko.applyBindings(vm);
+        vm.initLine();
+    </script>
 </body>
+
 </html>

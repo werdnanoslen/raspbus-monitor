@@ -19,10 +19,9 @@ app.get('/', function(req, res) {
 
 io.on('connection', function(socket) {
     setInterval(function() {
-        // var state = led.readSync();
-        // led.writeSync(Number(!state));
-        // var data = Number(state);
-        var data = getRandomInt(0, 100);
+        var state = led.readSync();
+        led.writeSync(Number(!state));
+        var data = Number(state);
         sampleCollection.insert({
             "sensorvalue": data,
             "datetime": new Date()
@@ -50,7 +49,3 @@ function getLatestSamples(theCount, callback) {
             callback(docList);
         });
 };
-
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
