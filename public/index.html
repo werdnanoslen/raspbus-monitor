@@ -42,11 +42,13 @@
             });
 
             self.initLine = function() {
+                var data = self.lineChartData().datasets[0].data;
+                var max = Math.max.apply(Math, data);
                 var options = {
                     animation: false,
                     scaleOverride: true,
-                    scaleSteps: 1, // The number of steps in a hard coded scale
-                    scaleStepWidth: 1, // The value jump in the hard coded scale
+                    scaleSteps: max/10, // The number of steps in a hard coded scale
+                    scaleStepWidth: 10, // The value jump in the hard coded scale
                     scaleStartValue: 0 // The scale starting value
                 };
 

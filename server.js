@@ -3,12 +3,15 @@
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+
 var Engine = require('tingodb')();
 var database = new Engine.Db(__dirname + '/db', {});
 var sampleCollection = database.collection('somestuff');
+
 var GPIO = require('onoff').Gpio;
 var led = new GPIO(18, 'out');
 var button = new GPIO(17, 'in', 'both');
+var lightSensor = new GPIO(23, 'in', 'both');
 
 server.listen(8080);
 console.log('Server listening on port :8080');
@@ -22,9 +25,9 @@ button.watch(light);
 
 io.on('connection', function(socket) {
     setInterval(function() {
-        var state = led.readSync();
-        led.writeSync(Number(!state));
-        var data = Number(state);
+        var ledState = led.readSync();
+        led.writeSync(Number(!ledState));
+        var data = lightSensor.readSync();
         sampleCollection.insert({
             "sensorvalue": data,
             "datetime": new Date()
