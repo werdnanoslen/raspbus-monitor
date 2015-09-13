@@ -12,9 +12,10 @@ var sampleCollection = database.collection('somestuff');
 var GPIO = require('onoff').Gpio;
 var led = new GPIO(18, 'out');
 var button = new GPIO(17, 'in', 'both');
-var lightSensor = new GPIO(23, 'in', 'both');
-var tsl2591Sensor = new tsl2591({device: '/dev/i2c-1'});
-var tsl2591SensorReady = false;
+var lightSensor = new tsl2591({device: '/dev/i2c-1'});
+var lightSensorReady = false;
+
+var lightSensorData;
 
 server.listen(8080);
 console.log('Server listening on port :8080');
@@ -32,23 +33,19 @@ io.on('connection', function(socket) {
         var ledState = led.readSync();
         led.writeSync(Number(!ledState));
 
-        //get simple light sensor data
-        var lightSensorData = lightSensor.readSync();
-
         //get complex light sensor data
-        if (tsl2591SensorReady) {
-            light.readLuminosity(function(err, data) {
+        if (lightSensorReady) {
+            lightSensor.readLuminosity(function(err, data) {
                 if (err) {
                     console.log(err);
                 }
                 else {
-                    lightSensorData = data;
-                    console.log(data);
+                    lightSensorData = data.vis_ir;
                 }
             });
         }
 
-        data = lightSensorData;
+        var data = lightSensorData;
         sampleCollection.insert({
             "sensorvalue": data,
             "datetime": new Date()
@@ -65,14 +62,14 @@ io.on('connection', function(socket) {
     }, 2000);
 });
 
-tsl2591Sensor.init({AGAIN: 0, ATIME: 1}, function(err) {
+lightSensor.init({AGAIN: 0, ATIME: 1}, function(err) {
     if (err) {
-        console.log(err);
+        console.err('lightSensor error:', err);
         process.exit(-1);
     }
     else {
-        console.log('TSL2591 ready');
-        tsl2591SensorReady = true;
+        console.log('lightSensor ready');
+        lightSensorReady = true;
     }
 });
 
