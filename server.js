@@ -6,7 +6,12 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var GPIO = require('onoff').Gpio;
 var tsl2591 = require('tsl2591');
-// var bmp085 = require('bmp085-sensor');
+var PythonShell = require('python-shell');
+
+var options = {
+  mode: 'text',
+  scriptPath: '/home/pi/web/raspbus-monitor/Adafruit_Python_BMP/examples'
+};
 
 var database = new Engine.Db(__dirname + '/db', {});
 var sampleCollection = database.collection('somestuff');
@@ -17,10 +22,9 @@ var accelX = new GPIO(25, 'in');
 var accelY = new GPIO(24, 'in');
 var accelZ = new GPIO(23, 'in');
 var lightSensor = new tsl2591({device: '/dev/i2c-1'});
-// var PTSensor = bmp085({address: 0x77, mode: 3});
 
 var lightSensorReady = false;
-var lightSensorData, accelData;
+var lightSensorData, accelData, accelDataString, barometerData;
 
 server.listen(8080);
 console.log('Server listening on port :8080');
@@ -39,12 +43,12 @@ io.on('connection', function(socket) {
         accelData['x'] = accelX.readSync();
         accelData['y'] = accelY.readSync();
         accelData['z'] = accelZ.readSync();
-        console.log(accelData.x + ', ' + accelData.y + ', ' + accelData.z);
+        accelDataString = accelData.x + ', ' + accelData.y + ', ' + accelData.z;
 
-        // PTSensor.read(function (err, data) {
-        //     console.log(data.pressure + ' - ' + data.temp);
-        //     // data is { pressure: 29.957463223223005, temp: 68.9 }
-        // });
+        PythonShell.run('simpletest.py', options, function (err, results) {
+            if (err) throw err;
+            barometerData = results;
+        });
 
         //get light sensor data
         if (lightSensorReady) {
@@ -58,20 +62,21 @@ io.on('connection', function(socket) {
             });
         }
 
-        var data = lightSensorData;
         sampleCollection.insert({
-            "sensorvalue": data,
+            "accelData": accelDataString,
+            "barometerData": barometerData,
+            "lightSensorData": lightSensorData,
             "datetime": new Date()
         });
         getLatestSamples(5, function(results) {
     		var theValues = [];
     		for(var i=0; i<results.length; i++)
     		{
-    			theValues.push(results[i].sensorvalue);
+    			theValues.push(results[i].barometerData);
     		}
     		console.log(theValues);
     	});
-        io.sockets.emit('pushdata', data);
+        io.sockets.emit('pushdata', lightSensorData);
     }, 2000);
 });
 
