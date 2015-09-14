@@ -1,23 +1,25 @@
 'use strict';
 
 var app = require('express')();
+var Engine = require('tingodb')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var GPIO = require('onoff').Gpio;
 var tsl2591 = require('tsl2591');
+// var bmp085 = require('bmp085-sensor');
 
-var Engine = require('tingodb')();
 var database = new Engine.Db(__dirname + '/db', {});
 var sampleCollection = database.collection('somestuff');
 
-var GPIO = require('onoff').Gpio;
 var led = new GPIO(18, 'out');
 
 var accelX = new GPIO(25, 'in');
 var accelY = new GPIO(24, 'in');
 var accelZ = new GPIO(23, 'in');
 var lightSensor = new tsl2591({device: '/dev/i2c-1'});
-var lightSensorReady = false;
+// var PTSensor = bmp085({address: 0x77, mode: 3});
 
+var lightSensorReady = false;
 var lightSensorData, accelData;
 
 server.listen(8080);
@@ -37,8 +39,14 @@ io.on('connection', function(socket) {
         accelData['x'] = accelX.readSync();
         accelData['y'] = accelY.readSync();
         accelData['z'] = accelZ.readSync();
+        console.log(accelData.x + ', ' + accelData.y + ', ' + accelData.z);
 
-        //get complex light sensor data
+        // PTSensor.read(function (err, data) {
+        //     console.log(data.pressure + ' - ' + data.temp);
+        //     // data is { pressure: 29.957463223223005, temp: 68.9 }
+        // });
+
+        //get light sensor data
         if (lightSensorReady) {
             lightSensor.readLuminosity(function(err, data) {
                 if (err) {
@@ -50,7 +58,7 @@ io.on('connection', function(socket) {
             });
         }
 
-        var data = accelData.x + ', ' + accelData.y + ', ' + accelData.z;
+        var data = lightSensorData;
         sampleCollection.insert({
             "sensorvalue": data,
             "datetime": new Date()
